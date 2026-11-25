@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Формирование ведомости ГПА</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <div class="eyebrow">Газпром · ГПА</div>
+      <h1>Формирование ведомости</h1>
+      <p>Выберите вид работ, компрессорную станцию и агрегат. Итоговый файл будет сформирован на основе шаблона.</p>
+    </header>
+
+    <section class="panel" aria-label="Параметры ведомости">
+      <div class="field">
+        <label for="workType">Вид работ</label>
+        <select id="workType">
+          <option value="">Выберите вид работ</option>
+          <option value="Капитальный ремонт">Капитальный ремонт (КР)</option>
+          <option value="Средний ремонт">Средний ремонт (СР)</option>
+          <option value="Техническое обслуживание">Техническое обслуживание (ТО)</option>
+          <option value="Текущий ремонт">Текущий ремонт (ТР)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="station">Компрессорная станция</label>
+        <select id="station" disabled>
+          <option value="">Загрузка списка КС…</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="equipment">Газоперекачивающий агрегат</label>
+        <select id="equipment" disabled>
+          <option value="">Сначала выберите КС</option>
+        </select>
+      </div>
+      <button id="generateButton" type="button" disabled>Сформировать ведомость</button>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </section>
+    <footer>Файлы шаблона и справочника считываются с сервера. Загрузка файлов пользователем не требуется.</footer>
+  </main>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
