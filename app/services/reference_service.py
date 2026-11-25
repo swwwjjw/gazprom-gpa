@@ -1,4 +1,4 @@
-"""Работа со справочником Тех-Места-ГПА.xlsx"""
+"""Работа с файлом Тех-Места-ГПА.xlsx"""
 
 from pathlib import Path
 from typing import Any
@@ -6,14 +6,13 @@ from typing import Any
 
 
 class ReferenceDataError(RuntimeError):
-    """Raised when the equipment reference cannot be read or is invalid."""
+    """Срабатывает, когда при невозможности обращения к файлам-источникам."""
 
 
 
 class ReferenceService:
-    """Loads the technical-place workbook using pandas."""
+    """Загружает информацию из файла Тех-Места-ГПА.xlsx."""
 
-    # Excel column letters are kept explicit to match the agreed workbook mapping.
     KS_COLUMN = "E"
     GPA_COLUMN = "G"
 
@@ -33,8 +32,6 @@ class ReferenceService:
             return self._cached_table
 
         try:
-            # Header is on Excel row 2. Read through AH because the agreed map
-            # includes columns AG and AH, even if they are currently empty.
             table = pd.read_excel(
                 self.workbook_path,
                 sheet_name=0,
@@ -45,9 +42,7 @@ class ReferenceService:
         except Exception as exc:
             raise ReferenceDataError("Не удалось прочитать файл техмест.") from exc
 
-
         if len(table.columns) < 36:
-            # Pandas omits trailing empty columns in some workbook versions.
             for index in range(len(table.columns), 36):
                 table[f"__empty_{index}"] = None
 
@@ -72,7 +67,6 @@ class ReferenceService:
 
     def get_stations(self) -> list[str]:
         table = self._read_table()
-        # Excel E is index 4 within the A:AH range.
         values = table.iloc[:, 4].map(self._clean_text)
         return sorted({value for value in values if value}, key=str.casefold)
 
@@ -99,7 +93,6 @@ class ReferenceService:
             raise ReferenceDataError("В справочнике найдено несколько строк для выбранного ГПА. Требуется уточнить запись.")
 
         row = matches.iloc[0]
-        # Return values keyed by Excel column letters, matching the header map.
         result: dict[str, Any] = {}
         for letter, index in self._excel_column_indexes().items():
             if index >= len(row):
@@ -112,7 +105,6 @@ class ReferenceService:
 
     @staticmethod
     def _excel_column_indexes() -> dict[str, int]:
-        # Index is relative to the A:AH dataframe range (A=0, B=1, ... AH=33).
         return {
             "A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6,
             "H": 7, "I": 8, "J": 9, "K": 10, "L": 11, "M": 12, "N": 13,
@@ -130,7 +122,6 @@ class ReferenceService:
 
         if value is None or pd.isna(value):
             return None
-        # pandas Timestamp is compatible with openpyxl's datetime values.
         if isinstance(value, pd.Timestamp):
             return value.to_pydatetime()
         return value
